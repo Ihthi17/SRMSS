@@ -14,6 +14,7 @@ const depotRoutes = require("./routes/depotRoutes");
 const driverRoutes = require("./routes/driverRoutes");
 const routeRoutes = require("./routes/routeRoutes");
 const scheduleRoutes = require("./routes/scheduleRoutes");
+const routeStopsRoutes = require("./routes/routeStopsRoutes");
 
 const app = express();
 
@@ -35,7 +36,7 @@ app.use("/api/routes", routeRoutes);
 app.use("/api/assignments", require("./routes/driverAssignmentRoutes"));
 app.use("/api/schedules", scheduleRoutes);
 app.use("/api/buses", require("./routes/busRoutes"));
-
+app.use("/api/route-stops", routeStopsRoutes);
 // Server Network Listener
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

@@ -182,7 +182,7 @@ export default function DriverManagement() {
               <p className="text-sm text-neutral-400">Map active logistics drivers into pre-configured timeline transit routes and shifts</p>
             </div>
             <button onClick={() => openModal("create")} className="bg-gradient-to-r from-amber-500 to-amber-600 text-neutral-950 font-bold px-5 py-2.5 rounded-lg text-sm shadow-md tracking-wide hover:opacity-90 transition-opacity">
-              + Dispatch Shift Assignment
+              + Add Shift Assignment
             </button>
           </div>
 

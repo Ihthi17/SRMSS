@@ -9,6 +9,7 @@ import DriverAssignment from "./pages/DriverAssignment";
 import RouteManagement from "./pages/RouteManagement";
 import ScheduleManagement from "./pages/ScheduleManagement";
 import BusManagement from "./pages/BusManagement";
+import ManageRouteStops from "./pages/ManageStops";
 import Login from "./pages/Login";
 
 function App() {
@@ -27,6 +28,7 @@ function App() {
          
          <Route path="/driver-assignment" element={<DriverAssignment />} />
           <Route path="/schedule-management" element={<ScheduleManagement />} />
+        <Route path="/manage-route-stops" element={<ManageRouteStops />} />
         
         
 

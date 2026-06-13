@@ -46,6 +46,19 @@ export default function Sidebar({ isOpen = true, role = "Super Admin" }) {
             Route Management
           </Link>
 
+          {/* Route Stop Management Node */}
+          <Link
+            to="/manage-route-stops"
+            className={`block py-2.5 px-4 rounded-lg text-sm font-medium transition-all ${
+              isActive("/manage-route-stops")
+                ? "bg-amber-500/10 text-amber-400 border-l-2 border-amber-500 font-semibold"
+                : "text-neutral-400 hover:bg-neutral-900 hover:text-white"
+            }` } 
+          >
+            Route Stop Management
+
+          </Link>
+
           {/* Fleet Asset Matrix Node */}
           <Link
             to="/buses"

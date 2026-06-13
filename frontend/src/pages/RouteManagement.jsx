@@ -161,7 +161,7 @@ const RouteManagement = () => {
               <p className="text-sm text-neutral-400">Map operational travel spans, specify total halts, and assign default standby transit rosters</p>
             </div>
             <button onClick={openCreateModal} className="bg-gradient-to-r from-amber-500 to-amber-600 text-neutral-950 font-bold px-5 py-2.5 rounded-lg text-sm tracking-wide shadow-md hover:opacity-90 transition-opacity whitespace-nowrap">
-              + Establish Route Track
+              +  Route Track
             </button>
           </div>
 
@@ -182,7 +182,7 @@ const RouteManagement = () => {
                       <th className="p-4 text-center">Distance</th>
                       <th className="p-4 text-center">Duration</th>
                       <th className="p-4">Assigned Bus Unit</th>
-                      <th className="p-4">Assigned Pilot (Driver)</th>
+                      <th className="p-4">Assigned  (Driver)</th>
                       <th className="p-4 text-right">Actions</th>
                     </tr>
                   </thead>

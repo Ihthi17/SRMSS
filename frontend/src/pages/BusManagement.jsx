@@ -167,7 +167,7 @@ const BusManagement = () => {
               <p className="text-sm text-neutral-400">Manage seating capacity matrices, operational statuses, and diagnostics logging limits</p>
             </div>
             <button onClick={openCreateModal} className="bg-gradient-to-r from-amber-500 to-amber-600 text-neutral-950 font-bold px-5 py-2.5 rounded-lg text-sm shadow-md tracking-wide hover:opacity-90 transition-opacity whitespace-nowrap">
-              + Initialize New Bus
+              + New Bus
             </button>
           </div>
 
