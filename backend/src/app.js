@@ -16,6 +16,7 @@ const routeRoutes = require("./routes/routeRoutes");
 const scheduleRoutes = require("./routes/scheduleRoutes");
 const routeStopsRoutes = require("./routes/routeStopsRoutes");
 const tripRoutes = require("./routes/tripRoutes");
+const settingsRoutes = require("./routes/settingsRoutes");
 
 const app = express();
 
@@ -39,6 +40,7 @@ app.use("/api/schedules", scheduleRoutes);
 app.use("/api/buses", require("./routes/busRoutes"));
 app.use("/api/route-stops", routeStopsRoutes);
 app.use("/api/trips", tripRoutes); // Trip Management
+app.use("/api/settings", settingsRoutes); // Settings — Backup & SMTP
 // Server Network Listener
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

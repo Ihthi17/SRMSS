@@ -163,7 +163,17 @@ export default function Sidebar({ isOpen = true, role = "Super Admin" }) {
           >
             Trip Management
           </Link>
-          
+
+          <Link
+            to="/settings"
+            className={`block py-2.5 px-4 rounded-lg text-sm font-medium transition-all duration-200 ${
+              isActive("/settings")
+                ? "bg-amber-500/10 text-amber-400 border-l-2 border-amber-500 font-semibold"
+                : "text-neutral-400 hover:bg-neutral-900 hover:text-white"
+            }`}
+          >
+            ⚙️ Settings
+          </Link>
 
         </nav>
       </div>

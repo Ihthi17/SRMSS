@@ -13,6 +13,7 @@ import BusManagement from "./pages/BusManagement";
 import ManageRouteStops from "./pages/ManageStops";
 import CreateRecurring from "./pages/CreateRecurring";
 import TripManagement from "./pages/TripManagement";
+import Settings from "./pages/Settings";
 import Login from "./pages/Login";
 
 function App() {
@@ -35,6 +36,7 @@ function App() {
         <Route path="/manage-route-stops" element={<ManageRouteStops />} />
         <Route path="/create-recurring" element={<CreateRecurring />} />
         <Route path="/trip-management" element={<TripManagement />} />
+        <Route path="/settings" element={<Settings />} />
         
         
 
