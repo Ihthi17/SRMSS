@@ -138,3 +138,87 @@ exports.deleteSchedule = async (req, res) => {
     res.status(500).json({ error: "Failed to drop entry block structural references: " + error.message });
   }
 };
+
+// Bulk create recurring schedules
+exports.createBulkSchedules = async (req, res) => {
+  const { schedules } = req.body;
+  
+  if (!Array.isArray(schedules) || schedules.length === 0) {
+    return res.status(400).json({ error: "No schedules provided" });
+  }
+
+  const connection = await db.getConnection();
+  
+  try {
+    await connection.beginTransaction();
+    
+    let createdCount = 0;
+    let skippedCount = 0;
+    const errors = [];
+
+    for (const schedule of schedules) {
+      const { depot_id, route_id, schedule_code, schedule_date, schedule_type, departure_time, expected_arrival_time, status } = schedule;
+      
+      // Check for conflicts with existing schedules
+      const conflictQuery = `
+        SELECT * FROM schedules 
+        WHERE route_id = ? 
+          AND schedule_date = ? 
+          AND status NOT IN ('Cancelled', 'Completed')
+          AND (
+            (departure_time <= ? AND expected_arrival_time >= ?) OR
+            (departure_time <= ? AND expected_arrival_time >= ?) OR
+            (? <= departure_time AND ? >= expected_arrival_time)
+          )
+      `;
+      
+      try {
+        const [conflicts] = await connection.execute(conflictQuery, [
+          route_id, schedule_date, 
+          departure_time, departure_time,
+          expected_arrival_time, expected_arrival_time,
+          departure_time, expected_arrival_time
+        ]);
+
+        if (conflicts.length > 0) {
+          skippedCount++;
+          errors.push(`Schedule ${schedule_code} conflicts with existing schedule ${conflicts[0].schedule_code}`);
+          continue;
+        }
+
+        // Insert the schedule
+        const insertQuery = `
+          INSERT INTO schedules (depot_id, route_id, schedule_code, schedule_date, schedule_type, departure_time, expected_arrival_time, status)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        `;
+        
+        await connection.execute(insertQuery, [
+          depot_id || null, route_id || null, schedule_code, schedule_date || null, 
+          schedule_type || null, departure_time || null, expected_arrival_time || null, status || 'Scheduled'
+        ]);
+        
+        createdCount++;
+        
+      } catch (err) {
+        errors.push(`Error creating schedule ${schedule_code}: ${err.message}`);
+        skippedCount++;
+      }
+    }
+
+    await connection.commit();
+    
+    res.status(201).json({ 
+      message: `Bulk schedule creation completed. Created: ${createdCount}, Skipped: ${skippedCount}`,
+      created: createdCount,
+      skipped: skippedCount,
+      errors: errors
+    });
+    
+  } catch (error) {
+    await connection.rollback();
+    console.error('Bulk schedule creation failed:', error);
+    res.status(500).json({ error: "Bulk schedule creation failed: " + error.message });
+  } finally {
+    connection.release();
+  }
+};

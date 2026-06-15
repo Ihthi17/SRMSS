@@ -13,6 +13,9 @@ export default function ScheduleManagement() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [customTypeMode, setCustomTypeMode] = useState(false);
 
+
+  
+
   const [formData, setFormData] = useState({
     depot_id: "", route_id: "", schedule_code: "", schedule_date: "",
     schedule_type: "", departure_time: "", expected_arrival_time: "", status: "Scheduled",

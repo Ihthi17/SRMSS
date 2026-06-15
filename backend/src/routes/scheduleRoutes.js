@@ -5,6 +5,7 @@ const scheduleController = require("../controllers/scheduleController");
 router.get("/", scheduleController.getAllSchedules);
 router.get("/types", scheduleController.getDistinctTypes);
 router.post("/", scheduleController.createSchedule);
+router.post("/bulk-create", scheduleController.createBulkSchedules);
 router.put("/:id", scheduleController.updateSchedule);
 router.delete("/:id", scheduleController.deleteSchedule);
 
