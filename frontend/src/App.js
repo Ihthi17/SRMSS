@@ -15,7 +15,8 @@ import CreateRecurring from "./pages/CreateRecurring";
 import TripManagement from "./pages/TripManagement";
 import Settings from "./pages/Settings";
 import Login from "./pages/Login";
-
+import FuelManagement from "./pages/FuelManagement";
+import MaintenanceManagement from "./pages/MaintenanceManagement";
 function App() {
   return (
     <BrowserRouter>
@@ -37,6 +38,8 @@ function App() {
         <Route path="/create-recurring" element={<CreateRecurring />} />
         <Route path="/trip-management" element={<TripManagement />} />
         <Route path="/settings" element={<Settings />} />
+        <Route path="/fuel-management" element={<FuelManagement />} />
+        <Route path="/maintenance-management" element={<MaintenanceManagement />} />
         
         
 

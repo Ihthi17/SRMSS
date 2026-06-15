@@ -41,6 +41,12 @@ app.use("/api/buses", require("./routes/busRoutes"));
 app.use("/api/route-stops", routeStopsRoutes);
 app.use("/api/trips", tripRoutes); // Trip Management
 app.use("/api/settings", settingsRoutes); // Settings — Backup & SMTP
+
+// Fuel & Maintenance Management
+app.use("/api/fuel",        require("./routes/fuelRoutes"));
+app.use("/api/maintenance", require("./routes/maintenanceRoutes"));
+app.use("/api/alerts",      require("./routes/alertRoutes"));
+
 // Server Network Listener
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
