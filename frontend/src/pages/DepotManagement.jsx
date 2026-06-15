@@ -1,13 +1,16 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import Navbar from "../components/Navbar";
 
 export default function DepotManagement() {
+  const navigate = useNavigate();
   const [depots, setDepots] = useState([]); 
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [recordsPerPage] = useState(5);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [viewMode, setViewMode] = useState("management"); // "management" or "dashboard"
 
   // Responsive Alert State Engine
   const [alertConfig, setAlertConfig] = useState({
@@ -33,7 +36,11 @@ export default function DepotManagement() {
 
   const fetchDepots = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/depots");
+      const endpoint = viewMode === "dashboard" 
+        ? "http://localhost:5000/api/depots/with-stats"
+        : "http://localhost:5000/api/depots";
+      
+      const response = await fetch(endpoint);
       const data = await response.json();
       
       if (Array.isArray(data)) {
@@ -52,7 +59,7 @@ export default function DepotManagement() {
 
   useEffect(() => {
     fetchDepots();
-  }, []);
+  }, [viewMode]);
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
@@ -124,6 +131,10 @@ export default function DepotManagement() {
     setIsModalOpen(true);
   };
 
+  const navigateToDashboard = (depotId) => {
+    navigate(`/depot-dashboard/${depotId}`);
+  };
+
   return (
     <div className="flex min-h-screen bg-neutral-950 text-white overflow-x-hidden relative">
       
@@ -160,12 +171,45 @@ export default function DepotManagement() {
         <div className="p-6 max-w-7xl w-full mx-auto space-y-6">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
-              <h1 className="text-2xl font-bold tracking-wide">Depot Infrastructure Logs</h1>
-              <p className="text-sm text-neutral-400">Configure corporate logistics hubs, stations, and local management contacts</p>
+              <h1 className="text-2xl font-bold tracking-wide">
+                {viewMode === "dashboard" ? "Depot Operations Overview" : "Depot Infrastructure Logs"}
+              </h1>
+              <p className="text-sm text-neutral-400">
+                {viewMode === "dashboard" 
+                  ? "Real-time operational status and performance metrics for all depot locations"
+                  : "Configure corporate logistics hubs, stations, and local management contacts"
+                }
+              </p>
             </div>
-            <button onClick={() => openModal("create")} className="bg-gradient-to-r from-amber-500 to-amber-600 text-neutral-950 font-bold px-5 py-2.5 rounded-lg text-sm shadow-md tracking-wide hover:opacity-90 transition-opacity">
-              + Register New Depot
-            </button>
+            <div className="flex gap-3">
+              <div className="flex bg-neutral-900 border border-neutral-800 rounded-lg p-1">
+                <button
+                  onClick={() => setViewMode("management")}
+                  className={`px-4 py-2 text-sm rounded-md transition-colors ${
+                    viewMode === "management"
+                      ? "bg-amber-500 text-neutral-950 font-medium"
+                      : "text-neutral-400 hover:text-white"
+                  }`}
+                >
+                  Management
+                </button>
+                <button
+                  onClick={() => setViewMode("dashboard")}
+                  className={`px-4 py-2 text-sm rounded-md transition-colors ${
+                    viewMode === "dashboard"
+                      ? "bg-amber-500 text-neutral-950 font-medium"
+                      : "text-neutral-400 hover:text-white"
+                  }`}
+                >
+                  Dashboard
+                </button>
+              </div>
+              {viewMode === "management" && (
+                <button onClick={() => openModal("create")} className="bg-gradient-to-r from-amber-500 to-amber-600 text-neutral-950 font-bold px-5 py-2.5 rounded-lg text-sm shadow-md tracking-wide hover:opacity-90 transition-opacity">
+                  + Register New Depot
+                </button>
+              )}
+            </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-neutral-900 p-4 rounded-xl border border-neutral-800">
@@ -183,8 +227,19 @@ export default function DepotManagement() {
                     <th className="p-4">Depot ID</th>
                     <th className="p-4">Station / Hub Name</th>
                     <th className="p-4">City Location</th>
-                    <th className="p-4">Supervisor Contact</th>
-                    <th className="p-4">Telephone Line</th>
+                    {viewMode === "dashboard" && (
+                      <>
+                        <th className="p-4 text-center">Total Buses</th>
+                        <th className="p-4 text-center">Available</th>
+                        <th className="p-4 text-center">Active Trips</th>
+                      </>
+                    )}
+                    {viewMode === "management" && (
+                      <>
+                        <th className="p-4">Supervisor Contact</th>
+                        <th className="p-4">Telephone Line</th>
+                      </>
+                    )}
                     <th className="p-4 text-right">Actions</th>
                   </tr>
                 </thead>
@@ -194,18 +249,56 @@ export default function DepotManagement() {
                       <td className="p-4 text-neutral-500 font-mono">#{depot.depot_id}</td>
                       <td className="p-4 font-medium text-white">{depot.depot_name}</td>
                       <td className="p-4 text-neutral-300">{depot.location || "—"}</td>
-                      <td className="p-4 text-neutral-300">{depot.contact_person || "—"}</td>
-                      <td className="p-4 text-neutral-400 font-mono">{depot.contact_phone || "—"}</td>
+                      
+                      {viewMode === "dashboard" && (
+                        <>
+                          <td className="p-4 text-center">
+                            <span className="inline-flex items-center justify-center w-8 h-8 bg-blue-500/10 text-blue-400 rounded-full font-mono text-sm">
+                              {depot.total_buses || 0}
+                            </span>
+                          </td>
+                          <td className="p-4 text-center">
+                            <span className="inline-flex items-center justify-center w-8 h-8 bg-emerald-500/10 text-emerald-400 rounded-full font-mono text-sm">
+                              {depot.available_buses || 0}
+                            </span>
+                          </td>
+                          <td className="p-4 text-center">
+                            <span className="inline-flex items-center justify-center w-8 h-8 bg-amber-500/10 text-amber-400 rounded-full font-mono text-sm">
+                              {depot.active_trips || 0}
+                            </span>
+                          </td>
+                        </>
+                      )}
+                      
+                      {viewMode === "management" && (
+                        <>
+                          <td className="p-4 text-neutral-300">{depot.contact_person || "—"}</td>
+                          <td className="p-4 text-neutral-400 font-mono">{depot.contact_phone || "—"}</td>
+                        </>
+                      )}
+                      
                       <td className="p-4 text-right space-x-2 whitespace-nowrap">
+                        {viewMode === "dashboard" && (
+                          <button 
+                            onClick={() => navigateToDashboard(depot.depot_id)} 
+                            className="text-xs text-emerald-400 hover:text-emerald-300 px-3 py-1.5 rounded bg-emerald-500/10 border border-emerald-500/20 transition-colors font-medium"
+                          >
+                            Open Dashboard
+                          </button>
+                        )}
                         <button onClick={() => openModal("view", depot)} className="text-xs text-neutral-400 hover:text-white px-2 py-1 rounded bg-neutral-950 border border-neutral-800 transition-colors">View</button>
-                        <button onClick={() => openModal("edit", depot)} className="text-xs text-amber-500 hover:text-amber-400 px-2 py-1 rounded bg-amber-500/10 border border-amber-500/20 transition-colors">Edit</button>
-                        <button onClick={() => handleDelete(depot.depot_id)} className="text-xs text-red-400 hover:text-red-300 px-2 py-1 rounded bg-red-500/10 border border-red-500/20 transition-colors">Delete</button>
+                        {viewMode === "management" && (
+                          <>
+                            <button onClick={() => openModal("edit", depot)} className="text-xs text-amber-500 hover:text-amber-400 px-2 py-1 rounded bg-amber-500/10 border border-amber-500/20 transition-colors">Edit</button>
+                            <button onClick={() => handleDelete(depot.depot_id)} className="text-xs text-red-400 hover:text-red-300 px-2 py-1 rounded bg-red-500/10 border border-red-500/20 transition-colors">Delete</button>
+                          </>
+                        )}
                       </td>
                     </tr>
                   ))}
                   {currentRecords.length === 0 && (
                     <tr>
-                      <td colSpan="6" className="p-8 text-center text-neutral-500 tracking-wide">
+                      <td colSpan={viewMode === "dashboard" ? "7" : "6"} className="p-8 text-center text-neutral-500 tracking-wide">
                         No depot locations matching configuration records found.
                       </td>
                     </tr>

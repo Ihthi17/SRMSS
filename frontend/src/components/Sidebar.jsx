@@ -141,6 +141,28 @@ export default function Sidebar({ isOpen = true, role = "Super Admin" }) {
           >
             Schedule Management
           </Link>
+
+          <Link
+            to="/create-recurring"
+            className={`block py-2.5 px-4 rounded-lg text-sm font-medium transition-all duration-200 ${
+              isActive("/create-recurring")
+                ? "bg-amber-500/10 text-amber-400 border-l-2 border-amber-500 font-semibold"
+                : "text-neutral-400 hover:bg-neutral-900 hover:text-white"
+            }`}
+          >
+            Create Recurring Schedules
+          </Link>
+
+          <Link
+            to="/trip-management"
+            className={`block py-2.5 px-4 rounded-lg text-sm font-medium transition-all duration-200 ${
+              isActive("/trip-management")
+                ? "bg-amber-500/10 text-amber-400 border-l-2 border-amber-500 font-semibold"
+                : "text-neutral-400 hover:bg-neutral-900 hover:text-white"
+            }`}
+          >
+            Trip Management
+          </Link>
           
 
         </nav>
