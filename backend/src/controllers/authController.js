@@ -1,6 +1,7 @@
 const db = require("../config/db");
 const bcrypt = require("bcrypt");
 const generateToken = require("../utils/generateToken");
+const { getPermissionsByRoleId } = require("./roleController");
 
 exports.login = async (req, res) => {
   const { username, password } = req.body;
@@ -39,6 +40,21 @@ exports.login = async (req, res) => {
     // Generate JWT Access Token
     const token = generateToken(user);
 
+    // Fetch this role's allowed pages
+    let permissions = [];
+    try {
+      permissions = await getPermissionsByRoleId(user.role_id);
+    } catch (_) {
+      // If permissions table not ready yet, return empty (all-access fallback handled on frontend)
+    }
+
+    // Fetch role name so frontend can identify Super Admin
+    let role_name = "";
+    try {
+      const [roleRows] = await db.query("SELECT role_name FROM roles WHERE role_id = ?", [user.role_id]);
+      role_name = roleRows.length ? roleRows[0].role_name : "";
+    } catch (_) {}
+
     // Send back the successful response layout mapping
     return res.json({
       message: "Login successful",
@@ -47,8 +63,10 @@ exports.login = async (req, res) => {
         id: user.user_id || user.id,
         username: user.username,
         role_id: user.role_id,
+        role_name,
         depot_id: user.depot_id,
       },
+      permissions,
     });
 
   } catch (error) {

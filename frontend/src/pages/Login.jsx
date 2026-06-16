@@ -20,11 +20,49 @@ export default function Login() {
       setLoading(true);
       const res = await login({ username, password });
       
+      const { token, user, permissions } = res.data;
+
       // Store token safely
-      localStorage.setItem("token", res.data.token);
-      
-      // Clear thread and transition to the protected administrative layout dashboard
-      navigate("/dashboard");
+      localStorage.setItem("token", token);
+      // Store user info and permissions for role-based access control
+      localStorage.setItem("user", JSON.stringify(user));
+      localStorage.setItem("permissions", JSON.stringify(permissions || []));
+
+      // Super Admin (role_id = 1) always gets full access regardless of permissions table
+      const isSuperAdmin = user.role_id === 1 || user.role_name === "SUPER_ADMIN" || user.role_name === "SUPERADMIN";
+
+      // If the role has no permissions configured and the user is NOT Super Admin,
+      // redirect to a "no access" page instead of the dashboard
+      if (!isSuperAdmin && (!permissions || permissions.length === 0)) {
+        navigate("/no-access");
+        return;
+      }
+
+      // Determine the first permitted page to land on
+      if (isSuperAdmin || permissions.includes("dashboard")) {
+        navigate("/dashboard");
+      } else {
+        // Land on the first page the role is permitted to see
+        const PAGE_ROUTES = {
+          "route-management":      "/routes",
+          "route-stop-management": "/manage-route-stops",
+          "bus-management":        "/buses",
+          "user-management":       "/user",
+          "role-management":       "/roles",
+          "depot-management":      "/depots",
+          "driver-management":     "/driver-management",
+          "driver-assignment":     "/driver-assignment",
+          "schedule-management":   "/schedule-management",
+          "create-recurring":      "/create-recurring",
+          "trip-management":       "/trip-management",
+          "fuel-management":       "/fuel-management",
+          "maintenance-management":"/maintenance-management",
+          "reports-analytics":     "/reports-analytics",
+          "settings":              "/settings",
+        };
+        const firstAllowed = permissions.find(p => PAGE_ROUTES[p]);
+        navigate(firstAllowed ? PAGE_ROUTES[firstAllowed] : "/no-access");
+      }
     } catch (err) {
       alert(err.response?.data?.message || "Login failed");
     } finally {
