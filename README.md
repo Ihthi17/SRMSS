@@ -198,30 +198,25 @@ The backend exposes REST APIs for:
 
 # Screenshots
 
-Add screenshots here.
-
-Example:
-
-```
 ## Dashboard
 
-![Dashboard](screenshots/dashbord.png)
+![Dashboard](screenshots/dashboard.png)
 
+## Route Management
 
-## Route
+![Route](screenshots/route.png)
 
-![Dashboard](screenshots/route.png)
+## Depot Dashboard
 
-##Deport Dashboard
-![Dashboard](screenshots/depot dashbord.png)
+![Depot Dashboard](screenshots/depot-dashboard.png)
 
 ## Report and Analysis
-![Dashboard](screenshots/report.png)
 
-##Fule Management
-![Dashboard](screenshots/fuel.png)
+![Report](screenshots/report.png)
 
-```
+## Fuel Management
+
+![Fuel](screenshots/fuel.png)
 
 ---
 
