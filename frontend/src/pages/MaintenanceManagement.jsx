@@ -69,7 +69,8 @@ export default function MaintenanceManagement() {
   const fetchVehicles = async () => {
     try {
       const res = await axios.get(`${BASE}/buses`);
-      if (Array.isArray(res.data)) setVehicles(res.data);
+      const rows = Array.isArray(res.data) ? res.data : (res.data?.data || []);
+      setVehicles(rows);
     } catch { /* silent */ }
   };
 
@@ -83,7 +84,9 @@ export default function MaintenanceManagement() {
       if (filterStart)   params.start_date         = filterStart;
       if (filterEnd)     params.end_date           = filterEnd;
       const res = await axios.get(`${BASE}/maintenance`, { params });
-      if (Array.isArray(res.data)) setRecords(res.data);
+      // API returns { data: [...], page, limit, total } — extract the array
+      const rows = Array.isArray(res.data) ? res.data : (res.data?.data || []);
+      setRecords(rows);
     } catch {
       showAlert("Failed to load maintenance records.", "error");
     } finally {
@@ -129,11 +132,17 @@ export default function MaintenanceManagement() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (formData.maintenance_status === "Completed" && !formData.next_maintenance_date) {
-      showAlert("next_maintenance_date is required when status is Completed.", "error");
+      showAlert("Next maintenance date is required when status is Completed.", "error");
       return;
     }
+    // Normalise time: input type="time" gives "HH:MM", backend expects "HH:MM:SS"
+    const normaliseTime = (t) => {
+      if (!t) return t;
+      return t.length === 5 ? t + ":00" : t;
+    };
     const payload = {
       ...formData,
+      maintenance_time: normaliseTime(formData.maintenance_time),
       cost: parseFloat(formData.cost),
       next_maintenance_date: formData.next_maintenance_date || null,
     };
@@ -249,7 +258,7 @@ export default function MaintenanceManagement() {
                 className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-neutral-950 rounded-lg text-xs font-bold tracking-wide">
                 Apply Filters
               </button>
-              <button onClick={() => { setFilterVehicle(""); setFilterStatus(""); setFilterType(""); setFilterStart(""); setFilterEnd(""); }}
+              <button onClick={() => { setFilterVehicle(""); setFilterStatus(""); setFilterType(""); setFilterStart(""); setFilterEnd(""); setTimeout(fetchRecords, 0); }}
                 className="px-4 py-2 bg-neutral-800 hover:bg-neutral-700 text-white rounded-lg text-xs font-semibold">
                 Clear
               </button>
