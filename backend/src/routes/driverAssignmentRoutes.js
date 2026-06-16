@@ -1,27 +1,22 @@
 const express = require("express");
 const router = express.Router();
-// Double-check this filename matches your sidebar file exactly!
-const assignmentController = require("../controllers/driverAssignmentController"); 
+const assignmentController = require("../controllers/driverAssignmentController");
 
-// 1. Dropdown Selection Endpoints
-// Final URL: http://localhost:5000/api/assignments/drivers/selection
-router.get("/drivers/selection", assignmentController.getDriversForSelection);
-
-// Final URL: http://localhost:5000/api/assignments/schedules/selection
+// ── Dropdown Selection Endpoints ──────────────────────────────────
+router.get("/drivers/selection",  assignmentController.getDriversForSelection);
 router.get("/schedules/selection", assignmentController.getSchedulesForSelection);
+router.get("/vehicles/selection",  assignmentController.getVehiclesForSelection);
 
-
-// 2. Core CRUD Endpoints
-// Final URL: http://localhost:5000/api/assignments
-router.get("/", assignmentController.getAllAssignments);
-
-// Final URL: http://localhost:5000/api/assignments
-router.post("/", assignmentController.createAssignment);
-
-// Final URL: http://localhost:5000/api/assignments/:id
-router.put("/:id", assignmentController.updateAssignment);
-
-// Final URL: http://localhost:5000/api/assignments/:id
+// ── Driver Assignments CRUD ───────────────────────────────────────
+router.get("/",      assignmentController.getAllAssignments);
+router.post("/",     assignmentController.createAssignment);
+router.put("/:id",   assignmentController.updateAssignment);
 router.delete("/:id", assignmentController.deleteAssignment);
+
+// ── Vehicle Assignments CRUD ──────────────────────────────────────
+router.get("/vehicles",        assignmentController.getAllVehicleAssignments);
+router.post("/vehicles",       assignmentController.createVehicleAssignment);
+router.put("/vehicles/:id",    assignmentController.updateVehicleAssignment);
+router.delete("/vehicles/:id", assignmentController.deleteVehicleAssignment);
 
 module.exports = router;
