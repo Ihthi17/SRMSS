@@ -47,6 +47,9 @@ app.use("/api/fuel",        require("./routes/fuelRoutes"));
 app.use("/api/maintenance", require("./routes/maintenanceRoutes"));
 app.use("/api/alerts",      require("./routes/alertRoutes"));
 
+// Reporting & Analytics
+app.use("/api/reports", require("./routes/reportRoutes"));
+
 // Server Network Listener
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
