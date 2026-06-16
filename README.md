@@ -32,7 +32,7 @@ SRMSS (Smart Route Management & Scheduling System) is a web-based system develop
 - React.js
 - React Router
 - Axios
-- Bootstrap / CSS
+- TailwinCSS
 
 ## Backend
 
