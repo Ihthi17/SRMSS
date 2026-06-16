@@ -12,14 +12,14 @@ const ALL_NAV_ITEMS = [
   { to: "/depots",               label: "Depot Terminals",            pageKey: "depot-management" },
   { to: "/driver-management",    label: "Driver Roster Profiles",     pageKey: "driver-management" },
   { to: "/driver-assignment",    label: "Shift Assignments",          pageKey: "driver-assignment" },
-  { to: "/vehicle-assignment",   label: "🚌 Vehicle Assignments",      pageKey: "vehicle-assignment" },
+  { to: "/vehicle-assignment",   label: " Vehicle Assignments",      pageKey: "vehicle-assignment" },
   { to: "/schedule-management",  label: "Schedule Management",        pageKey: "schedule-management" },
   { to: "/create-recurring",     label: "Create Recurring Schedules", pageKey: "create-recurring" },
   { to: "/trip-management",      label: "Trip Management",            pageKey: "trip-management" },
-  { to: "/fuel-management",      label: "⛽ Fuel Log",               pageKey: "fuel-management" },
-  { to: "/maintenance-management", label: "🔧 Maintenance Log",      pageKey: "maintenance-management" },
-  { to: "/reports-analytics",    label: "📊 Reports & Analytics",    pageKey: "reports-analytics" },
-  { to: "/settings",             label: "⚙️ Settings",               pageKey: "settings" },
+  { to: "/fuel-management",      label: " Fuel Log",               pageKey: "fuel-management" },
+  { to: "/maintenance-management", label: " Maintenance Log",      pageKey: "maintenance-management" },
+  { to: "/reports-analytics",    label: " Reports & Analytics",    pageKey: "reports-analytics" },
+  { to: "/settings",             label: " Settings",               pageKey: "settings" },
 ];
 
 export default function Sidebar({ isOpen = true, role = "Super Admin" }) {
