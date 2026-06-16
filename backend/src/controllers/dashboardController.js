@@ -31,33 +31,14 @@ exports.getStats = async (req, res) => {
 // ─── Trip metrics — all trips (not filtered to today since test data is in 2026) ─
 exports.getTripMetrics = async (req, res) => {
   try {
-    // Use the most recent trip_date as "context date" so demo data always shows
-    const [latestRow] = await db.query("SELECT MAX(trip_date) AS latest FROM trips");
-    const refDate = latestRow[0]?.latest
-      ? latestRow[0].latest.toISOString ? latestRow[0].latest.toISOString().split("T")[0] : String(latestRow[0].latest).split("T")[0]
-      : new Date().toISOString().split("T")[0];
-
-    // Count trips on the most recent date that has any trips
-    const [today_trips] = await db.query(
-      `SELECT
-         SUM(CASE WHEN trip_status IN ('Scheduled','In Progress') THEN 1 ELSE 0 END) AS active,
-         SUM(CASE WHEN trip_status = 'Completed'  THEN 1 ELSE 0 END) AS completed,
-         SUM(CASE WHEN trip_status = 'Delayed'    THEN 1 ELSE 0 END) AS delayed,
-         SUM(CASE WHEN trip_status = 'Cancelled'  THEN 1 ELSE 0 END) AS cancelled,
-         COUNT(*) AS total
-       FROM trips
-       WHERE DATE(trip_date) = ?`,
-      [refDate]
-    );
-
-    // Total across all trips
+    // Count all trips by status — use safe alias names (delayed/cancelled are reserved in MariaDB)
     const [all_trips] = await db.query(
       `SELECT
-         SUM(CASE WHEN trip_status IN ('Scheduled','In Progress') THEN 1 ELSE 0 END) AS active,
-         SUM(CASE WHEN trip_status = 'Completed'  THEN 1 ELSE 0 END) AS completed,
-         SUM(CASE WHEN trip_status = 'Delayed'    THEN 1 ELSE 0 END) AS delayed,
-         SUM(CASE WHEN trip_status = 'Cancelled'  THEN 1 ELSE 0 END) AS cancelled,
-         COUNT(*) AS total
+         SUM(CASE WHEN trip_status IN ('Scheduled','In Progress') THEN 1 ELSE 0 END) AS active_count,
+         SUM(CASE WHEN trip_status = 'Completed'  THEN 1 ELSE 0 END)                 AS completed_count,
+         SUM(CASE WHEN trip_status = 'Delayed'    THEN 1 ELSE 0 END)                 AS delayed_count,
+         SUM(CASE WHEN trip_status = 'Cancelled'  THEN 1 ELSE 0 END)                 AS cancelled_count,
+         COUNT(*)                                                                     AS total_count
        FROM trips`
     );
 
@@ -67,15 +48,14 @@ exports.getTripMetrics = async (req, res) => {
       fuel_total = fuel[0]?.total ? parseFloat(fuel[0].total).toFixed(2) : "0.00";
     } catch (_) {}
 
+    const row = all_trips[0] || {};
     return res.status(200).json({
-      // Show per latest-date counts (so they're non-zero when data exists)
-      active_trips:    all_trips[0]?.active    || 0,
-      completed_trips: all_trips[0]?.completed || 0,
-      delayed_trips:   all_trips[0]?.delayed   || 0,
-      cancelled_trips: all_trips[0]?.cancelled || 0,
-      total_today:     all_trips[0]?.total     || 0,
-      fuel_used_today: fuel_total,
-      ref_date: refDate
+      active_trips:    parseInt(row.active_count)    || 0,
+      completed_trips: parseInt(row.completed_count) || 0,
+      delayed_trips:   parseInt(row.delayed_count)   || 0,
+      cancelled_trips: parseInt(row.cancelled_count) || 0,
+      total_today:     parseInt(row.total_count)     || 0,
+      fuel_used_today: fuel_total
     });
   } catch (error) {
     console.error("❌ getTripMetrics Error:", error);
@@ -97,12 +77,12 @@ exports.getTripChartData = async (req, res) => {
     // Go back 30 days from latest trip date
     const [dailyTrips] = await db.query(
       `SELECT
-         DATE(trip_date) AS date,
+         DATE(trip_date)                                                               AS date,
          SUM(CASE WHEN trip_status = 'Completed'                       THEN 1 ELSE 0 END) AS completed,
          SUM(CASE WHEN trip_status IN ('Scheduled','In Progress')       THEN 1 ELSE 0 END) AS active,
-         SUM(CASE WHEN trip_status = 'Cancelled'                        THEN 1 ELSE 0 END) AS cancelled,
-         SUM(CASE WHEN trip_status = 'Delayed'                          THEN 1 ELSE 0 END) AS delayed,
-         COUNT(*) AS total
+         SUM(CASE WHEN trip_status = 'Cancelled'                        THEN 1 ELSE 0 END) AS cancelled_count,
+         SUM(CASE WHEN trip_status = 'Delayed'                          THEN 1 ELSE 0 END) AS delayed_count,
+         COUNT(*)                                                                       AS total
        FROM trips
        WHERE trip_date >= DATE_SUB(?, INTERVAL 30 DAY)
        GROUP BY DATE(trip_date)
@@ -110,7 +90,17 @@ exports.getTripChartData = async (req, res) => {
       [maxDate]
     );
 
-    return res.status(200).json(dailyTrips || []);
+    // Rename aliases to safe frontend field names
+    const result = dailyTrips.map(r => ({
+      date:      r.date instanceof Date ? r.date.toISOString().split("T")[0] : String(r.date).split("T")[0],
+      completed: parseInt(r.completed) || 0,
+      active:    parseInt(r.active)    || 0,
+      cancelled: parseInt(r.cancelled_count) || 0,
+      delayed:   parseInt(r.delayed_count)   || 0,
+      total:     parseInt(r.total)     || 0,
+    }));
+
+    return res.status(200).json(result);
   } catch (error) {
     console.error("❌ getTripChartData Error:", error);
     return res.status(500).json({ message: "Error fetching trip chart data" });
@@ -129,9 +119,9 @@ exports.getRoutePerformance = async (req, res) => {
          r.estimated_duration,
          COUNT(t.trip_id)                                                  AS total_trips,
          SUM(CASE WHEN t.trip_status = 'Completed'  THEN 1 ELSE 0 END)   AS completed,
-         SUM(CASE WHEN t.trip_status = 'Delayed'    THEN 1 ELSE 0 END)   AS delayed,
-         SUM(CASE WHEN t.trip_status = 'Cancelled'  THEN 1 ELSE 0 END)   AS cancelled,
-         SUM(CASE WHEN t.trip_status IN ('Scheduled','In Progress') THEN 1 ELSE 0 END) AS active
+         SUM(CASE WHEN t.trip_status = 'Delayed'    THEN 1 ELSE 0 END)   AS delayed_count,
+         SUM(CASE WHEN t.trip_status = 'Cancelled'  THEN 1 ELSE 0 END)   AS cancelled_count,
+         SUM(CASE WHEN t.trip_status IN ('Scheduled','In Progress') THEN 1 ELSE 0 END) AS active_count
        FROM routes r
        LEFT JOIN schedules s ON s.route_id = r.route_id
        LEFT JOIN trips t     ON t.schedule_id = s.schedule_id
@@ -140,7 +130,12 @@ exports.getRoutePerformance = async (req, res) => {
        LIMIT 10`
     );
 
-    return res.status(200).json(routes || []);
+    return res.status(200).json((routes || []).map(r => ({
+      ...r,
+      delayed:  parseInt(r.delayed_count)   || 0,
+      cancelled: parseInt(r.cancelled_count) || 0,
+      active:   parseInt(r.active_count)    || 0,
+    })));
   } catch (error) {
     console.error("❌ getRoutePerformance Error:", error);
     return res.status(500).json({ message: "Error fetching route performance" });
