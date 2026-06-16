@@ -156,7 +156,7 @@ http://localhost:3000
 
 ```
 Username : superadmin
-Password : ********
+Password : admin123
 ```
 
 ---
