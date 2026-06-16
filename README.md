@@ -203,11 +203,24 @@ Add screenshots here.
 Example:
 
 ```
-<img width="1882" height="901" alt="image" src="https://github.com/user-attachments/assets/153031fb-68be-413c-9e0a-34b3cc24d911" />
+## Dashboard
+
+![Dashboard](screenshots/dashbord.png)
 
 
-screenshots/routes.png
-screenshots/schedules.png
+## Route
+
+![Dashboard](screenshots/route.png)
+
+##Deport Dashboard
+![Dashboard](screenshots/depot dashbord.png)
+
+## Report and Analysis
+![Dashboard](screenshots/report.png)
+
+##Fule Management
+![Dashboard](screenshots/fuel.png)
+
 ```
 
 ---
