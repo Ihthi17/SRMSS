@@ -506,7 +506,7 @@ CREATE TABLE `system_settings` (
 
 LOCK TABLES `system_settings` WRITE;
 /*!40000 ALTER TABLE `system_settings` DISABLE KEYS */;
-INSERT INTO `system_settings` VALUES (1,'smtp_host','smtp.gmail.com','2026-06-15 14:03:36'),(2,'smtp_port','587','2026-06-15 14:03:37'),(3,'smtp_user','mohamedihthisham17@gmail.com','2026-06-15 14:03:37'),(4,'smtp_secure','tls','2026-06-15 14:03:37'),(5,'smtp_from_name','SRMSS System','2026-06-15 14:03:37'),(6,'smtp_from_email','mohamedihthisham17@gmail.com','2026-06-15 14:03:37'),(7,'smtp_password','ibvx dwwh ridl mefa','2026-06-15 14:03:37');
+INSERT INTO `system_settings` VALUES (1,'smtp_host','smtp.gmail.com','2026-06-15 14:03:36'),(2,'smtp_port','587','2026-06-15 14:03:37'),(3,'smtp_user','mohamedihthisham17@gmail.com','2026-06-15 14:03:37'),(4,'smtp_secure','tls','2026-06-15 14:03:37'),(5,'smtp_from_name','SRMSS System','2026-06-15 14:03:37'),(6,'smtp_from_email','mohamedihthisham17@gmail.com','2026-06-15 14:03:37'),(7,'smtp_password','','2026-06-15 14:03:37');
 /*!40000 ALTER TABLE `system_settings` ENABLE KEYS */;
 UNLOCK TABLES;
 
